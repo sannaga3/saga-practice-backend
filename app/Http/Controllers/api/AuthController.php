@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
@@ -33,5 +33,15 @@ class AuthController extends Controller
 
         $validator->errors()->add('error', 'パスワードもしくはメールアドレスが一致しません');
         return response()->json(['errorMessages' => $validator->errors()->toArray()], 401);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return "ログアウトしました";
     }
 }
