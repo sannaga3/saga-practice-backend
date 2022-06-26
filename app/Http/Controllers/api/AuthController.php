@@ -44,4 +44,34 @@ class AuthController extends Controller
 
         return "ログアウトしました";
     }
+
+    public function signup(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:20',
+            'email' => 'required|string|email|unique:users|max:50',
+            'password' => 'required|string:min6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errorMessages' => $validator->errors()->toArray()], 401);
+        }
+
+        $user = new User;
+        $user->fill(array_merge(
+            $request->all(),
+            ['password' => Hash::make($request->password)]
+        ))->save();
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            $user = HandleSession::setSession($request, $credentials);
+            Auth::login($user);
+            return $user;
+        }
+
+        $validator->errors()->add('error', 'パスワードもしくはメールアドレスが一致しません');
+        return response()->json(['errorMessages' => $validator->errors()->toArray()], 401);
+    }
 }
