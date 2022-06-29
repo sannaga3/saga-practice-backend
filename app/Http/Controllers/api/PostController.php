@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Http\Requests\PostRequest;
 
 class PostController extends Controller
 {
@@ -17,6 +18,7 @@ class PostController extends Controller
     {
         $posts = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name')
             ->join('users', 'users.id', '=', 'posts.user_id')
+            ->orderby('id', 'desc')
             ->get();
 
         return $posts->isEmpty() ? [] : $posts;
@@ -28,9 +30,18 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        //
+        $post = Post::create($request->all());
+
+        return response()->json(
+            [
+                'id' => $post->id,
+                'title' => $post->title,
+                'content' => $post->content,
+                'user_id' => $post->user_id
+            ]
+        );
     }
 
     /**
