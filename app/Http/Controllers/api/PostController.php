@@ -62,9 +62,17 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PostRequest $request, $id)
     {
-        //
+        $post = Post::find($id);
+        $post->fill($request->all())->save();
+
+        $updated = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name')
+            ->join('users', 'users.id', '=', 'posts.user_id')
+            ->where('posts.id', $post->id)
+            ->get();
+
+        return $updated;
     }
 
     /**
