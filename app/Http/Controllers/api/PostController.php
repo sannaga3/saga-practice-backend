@@ -32,16 +32,13 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
-        $post = Post::create($request->all());
+        Post::create($request->all());
+        $post = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name', 'posts.created_at', 'posts.updated_at')
+            ->join('users', 'users.id', '=', 'posts.user_id')
+            ->orderByDesc('posts.id')
+            ->first();
 
-        return response()->json(
-            [
-                'id' => $post->id,
-                'title' => $post->title,
-                'content' => $post->content,
-                'user_id' => $post->user_id
-            ]
-        );
+        return $post;
     }
 
     /**
