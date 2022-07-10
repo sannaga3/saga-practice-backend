@@ -4,8 +4,8 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
+
 
 class PostController extends Controller
 {
@@ -16,60 +16,60 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name')
+        $posts = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.image', 'posts.image_name', 'posts.user_id', 'users.name as user_name')
             ->join('users', 'users.id', '=', 'posts.user_id')
             ->orderby('id', 'desc')
             ->get();
 
-        return $posts->isEmpty() ? [] : $posts;
+        $response = $posts->isEmpty() ? [] : $posts;
+        return response()->json($response, 200);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\PostRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(PostRequest $request)
     {
-        Post::create($request->all());
-        $post = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name', 'posts.created_at', 'posts.updated_at')
+        // ローカル環境に保存する場合、API側でBase64に変換する場合はImageServiceを作成する
+        // $base64Image = ImageService::handleBase64($request->image, $request->fileName);
+
+        // DBに保存
+        $post = new Post;
+        $post->fill($request->all())->save();
+
+        $post = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.image', 'posts.image_name', 'posts.user_id', 'users.name as user_name', 'posts.created_at', 'posts.updated_at')
             ->join('users', 'users.id', '=', 'posts.user_id')
             ->orderByDesc('posts.id')
             ->first();
 
-        return $post;
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return response()->json($post, 200);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\PostRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(PostRequest $request, $id)
     {
-        $post = Post::find($id);
-        $post->fill($request->all())->save();
+        // ローカル環境に保存する場合、API側でBase64に変換する場合はImageServiceで処理する
+        // $base64Image = ImageService::handleBase64($request->image, $request->fileName);
 
-        $updated = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.user_id', 'users.name as user_name')
+        $post = Post::find($id);
+
+        $post->fill($request->all())->update();
+
+        $updated = Post::select('posts.id', 'posts.title', 'posts.content', 'posts.image', 'posts.image_name', 'posts.user_id', 'users.name as user_name')
             ->join('users', 'users.id', '=', 'posts.user_id')
-            ->where('posts.id', $post->id)
+            ->where('posts.id', $id)
             ->get();
 
-        return $updated;
+        return response()->json($updated, 200);
     }
 
     /**

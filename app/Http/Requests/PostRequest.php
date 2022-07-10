@@ -30,7 +30,9 @@ class PostRequest extends FormRequest
         return [
             'title' => 'required|string|between:1,20',
             'content' => 'nullable|string|between:1,100',
-            'user_id' => 'required|integer|min:1'
+            'user_id' => 'required|integer|min:1',
+            'image' => 'nullable|string',
+            'image_name' => 'nullable|string'
         ];
     }
 
