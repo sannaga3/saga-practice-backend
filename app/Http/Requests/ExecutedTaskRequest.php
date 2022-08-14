@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 
-class TaskRequest extends FormRequest
+class ExecutedTaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,17 +28,9 @@ class TaskRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|between:1,20',
-            'purpose' => 'nullable|string|between:1,30',
-            'action' => 'required|string',
-            'times_unit' => 'required|string',
-            'target_times' => 'required|integer|min:1',
-            'times_unit' => 'required|string',
-            'schedule_start' => 'required|string',
-            'schedule_end' => 'required||string',
-            'remarks' => 'nullable|string',
-            'status' => 'required||string',
-            'user_id' => 'required|integer|min:1',
+            'times' => 'required|integer|min:1',
+            'date' => 'required|string',
+            'task_id' => 'required|integer|min:1',
         ];
     }
 

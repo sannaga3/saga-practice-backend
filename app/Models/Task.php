@@ -26,4 +26,9 @@ class Task extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function executed_tasks()
+    {
+        return $this->hasMany('App\Models\ExecutedTask');
+    }
 }

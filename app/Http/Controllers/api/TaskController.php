@@ -90,9 +90,9 @@ class TaskController extends Controller
      */
     public function update(TaskRequest $request, $id)
     {
-        $post = Task::find($id);
+        $task = Task::find($id);
 
-        $post->fill($request->all())->update();
+        $task->fill($request->all())->update();
 
         $updated = Task::select(
             'tasks.id',
